@@ -1,15 +1,14 @@
-import { Text, View, StyleSheet, FlatList, Pressable } from "react-native";
+import { Text, View, StyleSheet, FlatList, Pressable, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import VociItem from "../components/vociItem";
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-// Globalen Context importieren
 import { useVoci } from '../context/vociContext';
 
 export default function Index() {
   const router = useRouter();
   
-  // Vokabeln global aus dem Context ziehen
-  const { vociList } = useVoci();
+  // 1. Hole vociList UND isLoading aus dem globalen Context
+  const { vociList, isLoading } = useVoci();
   
   const renderEmptyContainer = () => {
     return (
@@ -22,6 +21,16 @@ export default function Index() {
       </View>
     );
   };
+
+  // 2. Aufgabe 4: Wenn die App lädt, zeige den ActivityIndicator zentriert an
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#b201a6" />
+        <Text style={styles.loadingText}>Vokabeln werden geladen...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -44,7 +53,7 @@ export default function Index() {
           styles.fabAdd,
           pressed && styles.fabPressed
         ]} 
-        onPress={() => router.push("/add")}
+        onPress={() => router.push("/addVoci")}
       >
         <Ionicons name="add" size={28} color="#fff" />
       </Pressable>
@@ -69,6 +78,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     paddingTop: 50,
+  },
+  // Styles für den neuen Ladebildschirm
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#666',
   },
   title: {
     fontSize: 32,
@@ -104,7 +125,6 @@ const styles = StyleSheet.create({
     color: '#888',
     textAlign: 'center',
   },
-  // Basis-Styling für beide Buttons gemeinsam
   fab: {
     position: 'absolute',
     bottom: 20,
@@ -119,16 +139,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4.65,
   },
-  // Spezifische Positionierung und Farben
   fabPlay: {
     right: 20,
-    backgroundColor: '#b201a6', // Lila
+    backgroundColor: '#b201a6',
   },
   fabAdd: {
     left: 20,
-    backgroundColor: '#2e7d32', // Grün
+    backgroundColor: '#2e7d32',
   },
-  // Dynamisches Feedback bei Klick für beide Buttons
   fabPressed: {
     opacity: 0.8,
     transform: [{ scale: 0.95 }],

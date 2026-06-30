@@ -1,33 +1,30 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
 import Voci from '../models/voci';
-import { Ionicons } from '@expo/vector-icons';
-// Context importieren, um die Löschfunktion zu nutzen
-import { useVoci } from '../context/vociContext';
 
 interface VociItemProps {
   voci: Voci;
 }
 
 export default function VociItem({ voci }: VociItemProps) {
-  // Löschfunktion aus dem globalen Context ziehen
-  const { removeVoci } = useVoci();
+  const router = useRouter();
+
+  const handlePress = () => {
+    // Navigiert zum Edit-Screen und übergibt den Begriff sicher codiert als URL-Parameter
+    router.push(`/editVoci?term=${encodeURIComponent(voci.term)}`);
+  };
 
   return (
-    <View style={styles.card}>
+    <Pressable 
+      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+      onPress={handlePress}
+    >
       <View style={styles.textContainer}>
         <Text style={styles.termText}>{voci.term}</Text>
         <Text style={styles.translationText}>{voci.translation}</Text>
       </View>
-      
-      {/* Lösch-Button */}
-      <Pressable 
-        style={({ pressed }) => [styles.deleteButton, pressed && styles.deleteButtonPressed]}
-        onPress={() => removeVoci(voci.term)}
-      >
-        <Ionicons name="trash-outline" size={22} color="#c62828" />
-      </Pressable>
-    </View>
+    </Pressable>
   );
 }
 
@@ -38,17 +35,18 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginVertical: 8,
     marginHorizontal: 4,
-    flexDirection: 'row', // Text und Mülleimer nebeneinander anordnen
-    alignItems: 'center',
-    justifyContent: 'space-between',
     elevation: 3,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
+  cardPressed: {
+    backgroundColor: '#f5f5f5',
+    transform: [{ scale: 0.99 }],
+  },
   textContainer: {
-    flex: 1, // Nimmt den restlichen Platz ein
+    width: '100%',
   },
   termText: {
     fontSize: 18,
@@ -59,13 +57,5 @@ const styles = StyleSheet.create({
   translationText: {
     fontSize: 15,
     color: '#666666',
-  },
-  deleteButton: {
-    padding: 8,
-    borderRadius: 8,
-  },
-  deleteButtonPressed: {
-    backgroundColor: '#ffebee', // Leichter roter Hintergrund beim Klicken
-    transform: [{ scale: 0.95 }],
   },
 });
